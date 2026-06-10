@@ -1,0 +1,65 @@
+run:
+  companies_per_run: 12        # how many companies to research per run (aim 10-15)
+  output_dir: "output"
+  history_file: "data/history.json"
+
+icp:
+  # ---- TARGETING: medical supply DISTRIBUTORS (the Medline pattern) ----
+  # Resellers/distributors of medical supplies, NOT end-user hospitals/clinics.
+  target_mode: "medical_supply_distributors"
+
+  industries:
+    - "medical supplies"
+    - "medical devices"
+    - "medical distribution"
+    - "wholesale medical supplies"
+    - "diagnostics"
+
+  keywords:
+    - "medical supply distributor"
+    - "hospital supplies"
+    - "specimen"
+    - "biohazard"
+    - "medical distribution"
+
+  employee_range:
+    min: 50
+    max: 2000
+
+  locations:
+    - "United States"
+
+  contact_titles:
+    - "Procurement Manager"
+    - "Director of Procurement"
+    - "Sourcing Manager"
+    - "Supply Chain Manager"
+    - "Purchasing Manager"
+    - "Category Manager"
+    - "Operations Manager"
+
+  exclude_keywords:
+    - "software"
+    - "health IT"
+    - "telehealth"
+
+  # ---- BLOCKLIST: companies that must NEVER be contacted ----
+  # INTERPLAST is a competitor of Medline (our current customer).
+  # Contacting them would jeopardize the existing Medline relationship.
+  # Add more names here over time as needed.
+  blocklist_companies:
+    - "Interplast"
+
+  # Optional: block by domain too (e.g. "interplast.com")
+  blocklist_domains: []
+
+research:
+  scrape_pages_per_company: 3   # homepage + up to N-1 internal pages (about/products)
+  enable_web_search: true        # extra signal-gathering via DuckDuckGo
+  max_sources_per_company: 8
+
+drafting:
+  model: "claude-sonnet-4-6"
+  max_tokens: 1000
+  tone: "professional, direct, concise"
+  word_count_target: 130

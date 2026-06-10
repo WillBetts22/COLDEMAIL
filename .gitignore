@@ -1,0 +1,16 @@
+# Secrets — never commit these
+.env
+
+# Generated output and data
+/output/
+/data/
+
+# Logs
+*.log
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
