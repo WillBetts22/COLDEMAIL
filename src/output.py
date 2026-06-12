@@ -36,12 +36,13 @@ COLUMNS = [
     ("Fit Summary", 46),
     ("Email Subject", 36),
     ("Email Body", 58),
+    ("Additional Contacts", 52),
     ("Sources", 52),
     ("Apollo / Data Notes", 36),
 ]
 
 # Columns that need word-wrap (0-indexed positions)
-_WRAP_COLS = {6, 8, 9, 10}  # Fit Summary, Email Body, Sources, Notes
+_WRAP_COLS = {6, 8, 9, 10, 11}  # Fit Summary, Email Body, Additional Contacts, Sources, Notes
 
 
 def write_spreadsheet(
@@ -112,6 +113,12 @@ def write_spreadsheet(
         body = result.email.body if result.email else ""
         fit_summary = result.fit_summary or ("DRAFT FAILED — review manually" if result.draft_failed else "")
 
+        add_contacts_lines = [
+            f"{ac.full_name}  |  {ac.title}  |  {ac.email}"
+            for ac in candidate.additional_contacts
+        ]
+        add_contacts_text = "\n".join(add_contacts_lines)
+
         row_data = [
             "",                                        # Decision — blank for user
             company.name,
@@ -122,6 +129,7 @@ def write_spreadsheet(
             fit_summary,
             subject,
             body,
+            add_contacts_text,
             sources_text,
             notes_text,
         ]

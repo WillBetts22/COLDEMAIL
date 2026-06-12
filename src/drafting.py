@@ -44,7 +44,9 @@ KEY CREDENTIALS (lead with these for medical audiences):
 - ~50,000 sq meter factory; ~250 production machines; ~1,500 tons/month capacity
 - FDA-CERTIFIED MATERIALS for packaging production
 - ISO 9001 CERTIFIED manufacturing
-- EXISTING MEDICAL CLIENT: Medline (supplies their zip-style specimen bags) — use as the social proof anchor
+- EXISTING MEDICAL CLIENT: A major national medical distributor (confidential) — currently supplies their
+  zip-style specimen bags. Reference as "a leading national medical distributor" if social proof is needed,
+  but NEVER name the client.
 """
 
 SYSTEM_PROMPT = """You are a B2B sales copywriter helping Seng Seng Plastic reach medical supply distributors.
@@ -111,8 +113,9 @@ SENG SENG PITCH CONTEXT:
 {SENG_SENG_PITCH}
 
 INSTRUCTIONS:
-1. LEAD with FDA-certified materials + ISO 9001 certification + Medline as proof point.
-   These three are the gatekeepers for medical procurement audiences.
+1. LEAD with FDA-certified materials + ISO 9001 certification as the trust anchors.
+   These are the gatekeepers for medical procurement audiences. If social proof is needed,
+   reference "a leading national medical distributor" — never name the client.
 2. Open the email with ONE specific, real observation about {company.name} drawn only from
    the research above. Never fabricate a fact.
 3. Target approximately {word_count} words for the email body. Tone: {tone}.
@@ -121,7 +124,9 @@ INSTRUCTIONS:
 6. Fit summary: 2-3 sentences, grounded only in the research provided.
    Answer: why is {company.name} a plausible buyer of medical packaging specifically?
 7. If website data was unavailable, personalize using industry knowledge and Apollo data only.
-8. Return ONLY the JSON object. No markdown. No extra text."""
+8. Return ONLY the JSON object. No markdown. No extra text.
+9. CRITICAL: Do NOT mention "Medline" anywhere in the email — not as a reference, not as
+   a proof point, not anywhere. Use "a leading national medical distributor" instead."""
 
 
 def _strip_fences(raw: str) -> str:

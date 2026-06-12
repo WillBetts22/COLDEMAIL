@@ -20,7 +20,7 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
-from src.config import load_config
+from src.config import add_to_blocklist, load_config
 from src.dedupe import filter_candidates, write_history
 from src.drafting import draft_email
 from src.logging_setup import setup_logging
@@ -130,6 +130,25 @@ def main() -> None:
 
     console.print(f"  Done — {website_failures} website(s) unavailable (those rows use Apollo data only).")
 
+    # ── Medline Partner Filter ────────────────────────────────────────────────
+    medline_filtered = []
+    medline_dropped = 0
+    for r in researched:
+        if r.medline_mention:
+            company_name = r.candidate.company.name
+            console.print(f"  [yellow]MEDLINE PARTNER:[/yellow] {company_name!r} — skipping and adding to blocklist.")
+            if company_name not in config.icp.blocklist_companies:
+                config.icp.blocklist_companies.append(company_name)
+                if not args.dry_run:
+                    add_to_blocklist(company_name)
+                    logger.info(f"Auto-added '{company_name}' to blocklist_companies in config.yaml.")
+            medline_dropped += 1
+        else:
+            medline_filtered.append(r)
+    if medline_dropped:
+        console.print(f"  Dropped {medline_dropped} Medline partner(s).")
+    researched = medline_filtered
+
     # ── Stage 4: Draft ────────────────────────────────────────────────────────
     console.print(f"\n[bold]Stage 4/5 — Drafting emails with Claude ({config.drafting.model})...[/bold]")
     anthropic_client = anthropic.Anthropic(api_key=config.anthropic_api_key)
@@ -170,6 +189,7 @@ def main() -> None:
     if blocklisted:
         for cand, entry in blocklisted:
             table.add_row(f"  └ {cand.company.name}", f"matched '{entry}'")
+    table.add_row("Medline partners auto-blocked", str(medline_dropped))
     table.add_row("Companies researched", str(len(new_candidates)))
     table.add_row("Website failures", str(website_failures))
     table.add_row("Draft failures", str(draft_failures))

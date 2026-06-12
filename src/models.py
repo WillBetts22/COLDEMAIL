@@ -22,6 +22,7 @@ class Company(BaseModel):
 class Candidate(BaseModel):
     company: Company
     contact: Contact
+    additional_contacts: List["Contact"] = []
 
 
 class ResearchItem(BaseModel):
@@ -36,6 +37,7 @@ class CompanyResearch(BaseModel):
     raw_website_text: str = ""
     website_available: bool = True
     notes: List[str] = []
+    medline_mention: bool = False
 
 
 class EmailDraft(BaseModel):

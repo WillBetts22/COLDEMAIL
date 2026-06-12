@@ -12,7 +12,8 @@ Confirmed endpoint (docs.apollo.io/reference/people-api-search, June 2026):
   with { id, reveal_personal_emails: true } — this call consumes credits.
 """
 import logging
-from typing import List, Optional, Tuple
+from collections import defaultdict
+from typing import Dict, List, Optional, Tuple
 
 import requests
 from tenacity import (
@@ -242,4 +243,24 @@ def search_candidates(config: AppConfig, target_count: int) -> Tuple[List[Candid
     if no_email_dropped:
         logger.info(f"Dropped {no_email_dropped} contact(s) with no resolvable email.")
     logger.info(f"Built {len(candidates)} candidate records. Apollo credit calls made: {credit_calls}.")
-    return candidates, credit_calls
+
+    # Group by company domain (or name fallback), keep primary + up to 2 additional contacts
+    grouped: Dict[str, List[Candidate]] = defaultdict(list)
+    for cand in candidates:
+        key = cand.company.domain or cand.company.name.lower()
+        grouped[key].append(cand)
+
+    final_candidates: List[Candidate] = []
+    for key, group in grouped.items():
+        primary = group[0]
+        extras = group[1:3]
+        final_candidates.append(
+            Candidate(
+                company=primary.company,
+                contact=primary.contact,
+                additional_contacts=[c.contact for c in extras],
+            )
+        )
+
+    logger.info(f"Collapsed to {len(final_candidates)} unique companies (with up to 2 additional contacts each).")
+    return final_candidates, credit_calls

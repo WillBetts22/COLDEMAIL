@@ -199,10 +199,18 @@ def research_company(candidate: Candidate, config: AppConfig) -> CompanyResearch
     # Cap website text passed to Claude to keep prompt size reasonable
     raw_text = "\n\n---\n\n".join(raw_parts)[:8000]
 
+    # Detect Medline partnership — check all scraped text and web findings
+    all_research_text = raw_text + " " + " ".join(item.finding for item in research_items)
+    medline_mention = bool(re.search(r'\bmedline\b', all_research_text, re.IGNORECASE))
+    if medline_mention:
+        notes.append("Medline partner detected — company mentions Medline in their content.")
+        logger.warning(f"{company.name} — Medline mention detected; will be added to blocklist.")
+
     return CompanyResearch(
         candidate=candidate,
         research_items=research_items[: config.research.max_sources_per_company],
         raw_website_text=raw_text,
         website_available=website_available,
         notes=notes,
+        medline_mention=medline_mention,
     )

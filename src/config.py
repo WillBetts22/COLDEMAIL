@@ -72,6 +72,18 @@ def _require_env(key: str) -> str:
     return val
 
 
+def add_to_blocklist(company_name: str, config_path: str = "config.yaml") -> None:
+    """Append company_name to blocklist_companies in config.yaml."""
+    path = Path(config_path)
+    with open(path, encoding="utf-8") as f:
+        raw = yaml.safe_load(f)
+    blocklist = raw.setdefault("icp", {}).setdefault("blocklist_companies", [])
+    if company_name not in blocklist:
+        blocklist.append(company_name)
+        with open(path, "w", encoding="utf-8") as f:
+            yaml.dump(raw, f, allow_unicode=True, default_flow_style=False, sort_keys=False)
+
+
 def load_config(config_path: str = "config.yaml") -> AppConfig:
     path = Path(config_path)
     if not path.exists():

@@ -24,7 +24,7 @@ icp:
 
   employee_range:
     min: 50
-    max: 2000
+    max: 10000
 
   locations:
     - "United States"
